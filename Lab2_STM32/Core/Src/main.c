@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "software_timer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -41,6 +41,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim2;
+int index_led = 0;
 
 /* USER CODE BEGIN PV */
 
@@ -56,6 +57,88 @@ static void MX_TIM2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void display7SEG(int num){
+	// reset hết v�? off (tất cả các chân segment = SET cho common anode)
+	HAL_GPIO_WritePin(GPIOB, a_7seg_Pin, SET);
+	HAL_GPIO_WritePin(GPIOB, b_7seg_Pin, SET);
+	HAL_GPIO_WritePin(GPIOB, c_7seg_Pin, SET);
+	HAL_GPIO_WritePin(GPIOB, d_7seg_Pin, SET);
+	HAL_GPIO_WritePin(GPIOB, e_7seg_Pin, SET);
+	HAL_GPIO_WritePin(GPIOB, f_7seg_Pin, SET);
+	HAL_GPIO_WritePin(GPIOB, g_7seg_Pin, SET);
+
+	switch (num){
+	case 0:
+		HAL_GPIO_WritePin(GPIOB, a_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, b_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, c_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, d_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, e_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, f_7seg_Pin, RESET);
+		break;
+	case 1:
+		HAL_GPIO_WritePin(GPIOB, b_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, c_7seg_Pin, RESET);
+		break;
+	case 2:
+		HAL_GPIO_WritePin(GPIOB, a_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, b_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, g_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, e_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, d_7seg_Pin, RESET);
+		break;
+	case 3:
+		HAL_GPIO_WritePin(GPIOB, a_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, b_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, g_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, c_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, d_7seg_Pin, RESET);
+		break;
+	case 4:
+		HAL_GPIO_WritePin(GPIOB, f_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, g_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, b_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, c_7seg_Pin, RESET);
+		break;
+	case 5:
+		HAL_GPIO_WritePin(GPIOB, a_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, f_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, g_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, c_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, d_7seg_Pin, RESET);
+		break;
+	case 6:
+		HAL_GPIO_WritePin(GPIOB, a_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, f_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, g_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, e_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, d_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, c_7seg_Pin, RESET);
+		break;
+	case 7:
+		HAL_GPIO_WritePin(GPIOB, a_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, b_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, c_7seg_Pin, RESET);
+		break;
+	case 8:
+		HAL_GPIO_WritePin(GPIOB, a_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, b_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, c_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, d_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, e_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, f_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, g_7seg_Pin, RESET);
+		break;
+	case 9:
+		HAL_GPIO_WritePin(GPIOB, a_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, b_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, c_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, d_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, f_7seg_Pin, RESET);
+		HAL_GPIO_WritePin(GPIOB, g_7seg_Pin, RESET);
+		break;
+	}
+}
 
 /* USER CODE END 0 */
 
@@ -89,6 +172,8 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Base_Start_IT(&htim2);
+  setTimer1(100);   // 100ms
 
   /* USER CODE END 2 */
 
@@ -97,6 +182,25 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+	  if(timer1_flag == 1){
+	      setTimer1(100);
+
+	      if(index_led == 0){
+	          HAL_GPIO_WritePin(GPIOA, EN0_Pin, GPIO_PIN_RESET);
+	          HAL_GPIO_WritePin(GPIOA, EN1_Pin, GPIO_PIN_SET);
+	          display7SEG(1);
+	          index_led = 1;
+	      }
+	      else {
+	          HAL_GPIO_WritePin(GPIOA, EN0_Pin, GPIO_PIN_SET);
+	          HAL_GPIO_WritePin(GPIOA, EN1_Pin, GPIO_PIN_RESET);
+	          display7SEG(2);
+	          index_led = 0;
+	      }
+
+	      // Nháy LED đỏ mỗi lần chuyển
+	      HAL_GPIO_TogglePin(GPIOA, LED_RED_Pin);
+	  }
 
     /* USER CODE BEGIN 3 */
   }
@@ -222,6 +326,11 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
+  if(htim->Instance == TIM2){
+    timerRun();
+  }
+}
 
 /* USER CODE END 4 */
 
