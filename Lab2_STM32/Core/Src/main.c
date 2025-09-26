@@ -201,7 +201,7 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim2);
-  setTimer1(50);   // 500ms
+  setTimer1(25);   // 250ms
   //int dot_counter = 0;
 
   /* USER CODE END 2 */
@@ -376,10 +376,18 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
   if(htim->Instance == TIM2){
     timerRun();
     if(timer1_flag == 1){
-    	setTimer1(50); // 500ms
-    	update7SEG(index_led);
-    	index_led++;
-    	if(index_led >= MAX_LED) index_led = 0;
+      setTimer1(25); // 250ms
+      update7SEG(index_led);
+      index_led++;
+      if(index_led >= MAX_LED) index_led = 0;
+
+      // Đếm thời gian cho LED DOT
+      static int dot_counter = 0;
+      dot_counter++;
+      if(dot_counter >= 4){   // 4 * 250ms = 1s
+        dot_counter = 0;
+        HAL_GPIO_TogglePin(GPIOA, DOT_Pin);
+      }
     }
   }
 }
