@@ -42,7 +42,7 @@
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim2;
 int index_led = 0;
-int led_buffer[4] = {1, 2, 0, 0};
+int led_buffer[4] = {1, 5, 0, 8};
 
 int hour = 15, minute = 8, second = 50;
 
