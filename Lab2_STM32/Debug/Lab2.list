@@ -481,7 +481,7 @@ int main(void)
  800040a:	2032      	movs	r0, #50	; 0x32
  800040c:	f000 f958 	bl	80006c0 <setTimer1>
 
-	        // Tắt tất cả EN
+	        // turnof all
 	        HAL_GPIO_WritePin(GPIOA, EN0_Pin|EN1_Pin|EN2_Pin|EN3_Pin, GPIO_PIN_SET);
  8000410:	2201      	movs	r2, #1
  8000412:	f44f 7170 	mov.w	r1, #960	; 0x3c0

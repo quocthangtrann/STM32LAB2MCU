@@ -188,7 +188,7 @@ int main(void)
 	    if(timer1_flag == 1){
 	        setTimer1(50);
 
-	        // Tắt tất cả EN
+	        // turnof all
 	        HAL_GPIO_WritePin(GPIOA, EN0_Pin|EN1_Pin|EN2_Pin|EN3_Pin, GPIO_PIN_SET);
 
 	        switch(index_led){
