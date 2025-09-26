@@ -42,7 +42,9 @@
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim2;
 int index_led = 0;
-int led_buffer[4] = {1, 2, 3, 4};
+int led_buffer[4] = {1, 2, 0, 0};
+
+int hour = 15, minute = 8, second = 50;
 
 /* USER CODE BEGIN PV */
 
@@ -53,7 +55,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
-
+void updateClockBuffer(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -144,29 +146,26 @@ void display7SEG(int num){
 /* USER CODE END 0 */
 
 void update7SEG(int index){
-	// Tắt tất cả LED trước
-	HAL_GPIO_WritePin(GPIOA, EN0_Pin|EN1_Pin|EN2_Pin|EN3_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOA, EN0_Pin|EN1_Pin|EN2_Pin|EN3_Pin, GPIO_PIN_SET);
 
-	switch(index){
-	case 0:
-		HAL_GPIO_WritePin(GPIOA, EN0_Pin, GPIO_PIN_RESET);
-		display7SEG(led_buffer[0]);
-		break;
-	case 1:
-		HAL_GPIO_WritePin(GPIOA, EN1_Pin, GPIO_PIN_RESET);
-		display7SEG(led_buffer[1]);
-		break;
-	case 2:
-		HAL_GPIO_WritePin(GPIOA, EN2_Pin, GPIO_PIN_RESET);
-		display7SEG(led_buffer[2]);
-		break;
-	case 3:
-		HAL_GPIO_WritePin(GPIOA, EN3_Pin, GPIO_PIN_RESET);
-		display7SEG(led_buffer[3]);
-		break;
-	default:
-		break;
-	}
+    switch(index){
+    case 0: HAL_GPIO_WritePin(GPIOA, EN0_Pin, GPIO_PIN_RESET);
+            display7SEG(led_buffer[0]); break;
+    case 1: HAL_GPIO_WritePin(GPIOA, EN1_Pin, GPIO_PIN_RESET);
+            display7SEG(led_buffer[1]); break;
+    case 2: HAL_GPIO_WritePin(GPIOA, EN2_Pin, GPIO_PIN_RESET);
+            display7SEG(led_buffer[2]); break;
+    case 3: HAL_GPIO_WritePin(GPIOA, EN3_Pin, GPIO_PIN_RESET);
+            display7SEG(led_buffer[3]); break;
+    }
+}
+
+// Cập nhật dữ liệu giờ phút vào led_buffer
+void updateClockBuffer(void){
+    led_buffer[0] = hour / 10;    // Chục giờ
+    led_buffer[1] = hour % 10;    // Đơn vị giờ
+    led_buffer[2] = minute / 10;  // Chục phút
+    led_buffer[3] = minute % 10;  // Đơn vị phút
 }
 
 
@@ -202,9 +201,11 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim2);
   setTimer1(25);   // 250ms
+  setTimer2(100);
   //int dot_counter = 0;
 
   /* USER CODE END 2 */
+  updateClockBuffer();
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -375,19 +376,33 @@ static void MX_GPIO_Init(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
   if(htim->Instance == TIM2){
     timerRun();
-    if(timer1_flag == 1){
-      setTimer1(25); // 250ms
-      update7SEG(index_led);
-      index_led++;
-      if(index_led >= MAX_LED) index_led = 0;
 
-      // Đếm thời gian cho LED DOT
-      static int dot_counter = 0;
-      dot_counter++;
-      if(dot_counter >= 4){   // 4 * 250ms = 1s
-        dot_counter = 0;
-        HAL_GPIO_TogglePin(GPIOA, DOT_Pin);
+    // Quét 4 LED
+    if(timer1_flag == 1){
+      setTimer1(25);
+      update7SEG(index_led);
+      index_led = (index_led + 1) % MAX_LED;
+    }
+
+    // Cập nhật đồng hồ mỗi giây
+    if(timer2_flag == 1){
+      setTimer2(100);
+
+      second++;
+      if(second >= 60){
+        second = 0;
+        minute++;
       }
+      if(minute >= 60){
+        minute = 0;
+        hour++;
+      }
+      if(hour >= 24){
+        hour = 0;
+      }
+
+      updateClockBuffer();
+      HAL_GPIO_TogglePin(GPIOA, DOT_Pin); // DOT nháy mỗi giây
     }
   }
 }
