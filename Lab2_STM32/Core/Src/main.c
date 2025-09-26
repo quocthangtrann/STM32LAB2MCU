@@ -212,39 +212,34 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-//	    if(timer1_flag == 1){
-//	        setTimer1(50);
-//
-//	        // turnof all
-//	        HAL_GPIO_WritePin(GPIOA, EN0_Pin|EN1_Pin|EN2_Pin|EN3_Pin, GPIO_PIN_SET);
-//
-//	        switch(index_led){
-//	        case 0:
-//	            HAL_GPIO_WritePin(GPIOA, EN0_Pin, GPIO_PIN_RESET);
-//	            display7SEG(led_value[0]);
-//	            break;
-//	        case 1:
-//	            HAL_GPIO_WritePin(GPIOA, EN1_Pin, GPIO_PIN_RESET);
-//	            display7SEG(led_value[1]);
-//	            break;
-//	        case 2:
-//	            HAL_GPIO_WritePin(GPIOA, EN2_Pin, GPIO_PIN_RESET);
-//	            display7SEG(led_value[2]);
-//	            break;
-//	        case 3:
-//	            HAL_GPIO_WritePin(GPIOA, EN3_Pin, GPIO_PIN_RESET);
-//	            display7SEG(led_value[3]);
-//	            break;
-//	        }
-//	        index_led = (index_led + 1) % 4;
-//
-//	        // Đếm thời gian cho LED DOT
-//	        dot_counter++;
-//	        if(dot_counter >= 2){ // 2 * 500ms = 1s
-//	            dot_counter = 0;
-//	            HAL_GPIO_TogglePin(GPIOA, DOT_Pin);
-//	        }
-//	    }
+	    if(timer1_flag == 1){
+	      timer1_flag = 0;
+	      setTimer1(25);
+	      update7SEG(index_led);
+	      index_led = (index_led + 1) % MAX_LED;
+	    }
+
+	    // Cập nhật đồng hồ và DOT
+	    if(timer2_flag == 1){
+	      timer2_flag = 0;
+	      setTimer2(100);
+
+	      second++;
+	      if(second >= 60){
+	        second = 0;
+	        minute++;
+	      }
+	      if(minute >= 60){
+	        minute = 0;
+	        hour++;
+	      }
+	      if(hour >= 24){
+	        hour = 0;
+	      }
+
+	      updateClockBuffer();
+	      HAL_GPIO_TogglePin(GPIOA, DOT_Pin);
+	    }
 
     /* USER CODE BEGIN 3 */
   }
@@ -376,34 +371,6 @@ static void MX_GPIO_Init(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
   if(htim->Instance == TIM2){
     timerRun();
-
-    // Quét 4 LED
-    if(timer1_flag == 1){
-      setTimer1(25);
-      update7SEG(index_led);
-      index_led = (index_led + 1) % MAX_LED;
-    }
-
-    // Cập nhật đồng hồ mỗi giây
-    if(timer2_flag == 1){
-      setTimer2(100);
-
-      second++;
-      if(second >= 60){
-        second = 0;
-        minute++;
-      }
-      if(minute >= 60){
-        minute = 0;
-        hour++;
-      }
-      if(hour >= 24){
-        hour = 0;
-      }
-
-      updateClockBuffer();
-      HAL_GPIO_TogglePin(GPIOA, DOT_Pin); // DOT nháy mỗi giây
-    }
   }
 }
 
