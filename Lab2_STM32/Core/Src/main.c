@@ -42,6 +42,8 @@
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim2;
 int index_led = 0;
+int led_value[4] = {1, 2, 3, 0};   // LED1=1, LED2=2, LED3=3, LED4=0
+int dot_flag = 0;
 
 /* USER CODE BEGIN PV */
 
@@ -173,7 +175,8 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim2);
-  setTimer1(100);   // 100ms
+  setTimer1(50);   // 500ms
+  int dot_counter = 0;
 
   /* USER CODE END 2 */
 
@@ -182,25 +185,39 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  if(timer1_flag == 1){
-	      setTimer1(100);
+	    if(timer1_flag == 1){
+	        setTimer1(50);
 
-	      if(index_led == 0){
-	          HAL_GPIO_WritePin(GPIOA, EN0_Pin, GPIO_PIN_RESET);
-	          HAL_GPIO_WritePin(GPIOA, EN1_Pin, GPIO_PIN_SET);
-	          display7SEG(1);
-	          index_led = 1;
-	      }
-	      else {
-	          HAL_GPIO_WritePin(GPIOA, EN0_Pin, GPIO_PIN_SET);
-	          HAL_GPIO_WritePin(GPIOA, EN1_Pin, GPIO_PIN_RESET);
-	          display7SEG(2);
-	          index_led = 0;
-	      }
+	        // Tắt tất cả EN
+	        HAL_GPIO_WritePin(GPIOA, EN0_Pin|EN1_Pin|EN2_Pin|EN3_Pin, GPIO_PIN_SET);
 
-	      // Nháy LED đỏ mỗi lần chuyển
-	      HAL_GPIO_TogglePin(GPIOA, LED_RED_Pin);
-	  }
+	        switch(index_led){
+	        case 0:
+	            HAL_GPIO_WritePin(GPIOA, EN0_Pin, GPIO_PIN_RESET);
+	            display7SEG(led_value[0]);
+	            break;
+	        case 1:
+	            HAL_GPIO_WritePin(GPIOA, EN1_Pin, GPIO_PIN_RESET);
+	            display7SEG(led_value[1]);
+	            break;
+	        case 2:
+	            HAL_GPIO_WritePin(GPIOA, EN2_Pin, GPIO_PIN_RESET);
+	            display7SEG(led_value[2]);
+	            break;
+	        case 3:
+	            HAL_GPIO_WritePin(GPIOA, EN3_Pin, GPIO_PIN_RESET);
+	            display7SEG(led_value[3]);
+	            break;
+	        }
+	        index_led = (index_led + 1) % 4;
+
+	        // Đếm thời gian cho LED DOT
+	        dot_counter++;
+	        if(dot_counter >= 2){ // 2 * 500ms = 1s
+	            dot_counter = 0;
+	            HAL_GPIO_TogglePin(GPIOA, DOT_Pin);
+	        }
+	    }
 
     /* USER CODE BEGIN 3 */
   }
@@ -301,14 +318,17 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LED_RED_Pin|EN0_Pin|EN1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, DOT_Pin|LED_RED_Pin|EN0_Pin|EN1_Pin
+                          |EN2_Pin|EN3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, a_7seg_Pin|b_7seg_Pin|c_7seg_Pin|d_7seg_Pin
                           |e_7seg_Pin|f_7seg_Pin|g_7seg_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : LED_RED_Pin EN0_Pin EN1_Pin */
-  GPIO_InitStruct.Pin = LED_RED_Pin|EN0_Pin|EN1_Pin;
+  /*Configure GPIO pins : DOT_Pin LED_RED_Pin EN0_Pin EN1_Pin
+                           EN2_Pin EN3_Pin */
+  GPIO_InitStruct.Pin = DOT_Pin|LED_RED_Pin|EN0_Pin|EN1_Pin
+                          |EN2_Pin|EN3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
