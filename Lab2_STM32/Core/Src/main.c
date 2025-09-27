@@ -49,7 +49,7 @@ int hour = 15, minute = 8, second = 50;
 
 /* USER CODE BEGIN PV */
 int index_led_matrix = 0;
-uint8_t matrix_buffer[8] = {0x3C, 0x66, 0x66, 0x7E, 0x66, 0x66, 0x66, 0x00};
+uint8_t matrix_buffer[8] = {0x3C,0x66,0x66,0x7E,0x66,0x66,0x66,0x00};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -194,6 +194,13 @@ void updateLEDMatrix(int index){
     }
 }
 
+void shiftLeft(){
+    for(int i = 0; i < MAX_LED_MATRIX - 1; i++){
+        matrix_buffer[i] = matrix_buffer[i+1];
+    }
+    matrix_buffer[MAX_LED_MATRIX-1] = 0x00;
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -229,7 +236,8 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim2);
   setTimer1(25);   // 250ms
   setTimer2(100);
-  setTimer3(20);
+  setTimer3(2);
+  setTimer4(20);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -270,11 +278,17 @@ int main(void)
 	    // update led matrix
 	    if(timer3_flag == 1){
 	        timer3_flag = 0;
-	        setTimer3(20);
+	        setTimer3(2);
 	        updateLEDMatrix(index_led_matrix);
 	        index_led_matrix = (index_led_matrix + 1) % MAX_LED_MATRIX;
 	    }
 
+	    // animation
+	    if(timer4_flag == 1){
+	        timer4_flag = 0;
+	        setTimer4(200);
+	        shiftLeft();
+	    }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
