@@ -169,11 +169,9 @@ void updateClockBuffer(void){
 }
 
 void updateLEDMatrix(int index){
-    // Tắt hết các ENM trước khi quét (active low cho ULN2803)
     HAL_GPIO_WritePin(GPIOA, ENM0_Pin|ENM1_Pin|ENM2_Pin|ENM3_Pin|
                              ENM4_Pin|ENM5_Pin|ENM6_Pin|ENM7_Pin, GPIO_PIN_SET);
 
-    // Cập nhật dữ liệu hàng (ROW0-ROW7) từ matrix_buffer[index]
     uint8_t rowData = matrix_buffer[index];
     HAL_GPIO_WritePin(GPIOB, ROW0_Pin, (rowData & 0x01) ? GPIO_PIN_RESET : GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOB, ROW1_Pin, (rowData & 0x02) ? GPIO_PIN_RESET : GPIO_PIN_SET);
@@ -184,7 +182,6 @@ void updateLEDMatrix(int index){
     HAL_GPIO_WritePin(GPIOB, ROW6_Pin, (rowData & 0x40) ? GPIO_PIN_RESET : GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOB, ROW7_Pin, (rowData & 0x80) ? GPIO_PIN_RESET : GPIO_PIN_SET);
 
-    // Bật cột tương ứng (active low)
     switch(index){
     case 0: HAL_GPIO_WritePin(GPIOA, ENM0_Pin, GPIO_PIN_RESET); break;
     case 1: HAL_GPIO_WritePin(GPIOA, ENM1_Pin, GPIO_PIN_RESET); break;
