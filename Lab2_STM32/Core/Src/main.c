@@ -43,9 +43,9 @@
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim2;
 int index_led = 0;
-int led_buffer[4] = {1, 5, 0, 8};
+int led_buffer[4] = {1, 5, 5, 9};
 
-int hour = 15, minute = 8, second = 50;
+int hour = 15, minute = 59, second = 50;
 
 /* USER CODE BEGIN PV */
 int index_led_matrix = 0;
@@ -204,10 +204,11 @@ void updateLEDMatrix(int col){
 
 
 void shiftLeft(){
-    for(int i = 0; i < MAX_LED_MATRIX - 1; i++){
+	uint8_t temp = matrix_buffer[0];
+    for(int i = 0; i < MAX_LED_MATRIX; i++){
         matrix_buffer[i] = matrix_buffer[i+1];
     }
-    matrix_buffer[MAX_LED_MATRIX-1] = 0x00;
+    matrix_buffer[MAX_LED_MATRIX-1] = temp;
 }
 
 /* USER CODE END 0 */
