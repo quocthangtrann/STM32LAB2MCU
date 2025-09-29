@@ -572,7 +572,6 @@ void updateLEDMatrix(int col){
  80004fa:	b082      	sub	sp, #8
  80004fc:	af00      	add	r7, sp, #0
  80004fe:	6078      	str	r0, [r7, #4]
-    // 1. Tắt tất cả các cột
     HAL_GPIO_WritePin(GPIOA, ENM0_Pin|ENM1_Pin|ENM2_Pin|ENM3_Pin|
  8000500:	2201      	movs	r2, #1
  8000502:	f64f 410c 	movw	r1, #64524	; 0xfc0c
@@ -580,7 +579,6 @@ void updateLEDMatrix(int col){
  8000508:	f000 fea6 	bl	8001258 <HAL_GPIO_WritePin>
                              ENM4_Pin|ENM5_Pin|ENM6_Pin|ENM7_Pin, GPIO_PIN_SET);
 
-    // 2. Xuất dữ liệu theo từng hàng, lấy bit col của mỗi hàng
     HAL_GPIO_WritePin(GPIOB, ROW0_Pin, (matrix_buffer[0] & (1 << col)) ? GPIO_PIN_RESET : GPIO_PIN_SET);
  800050c:	4b74      	ldr	r3, [pc, #464]	; (80006e0 <updateLEDMatrix+0x1e8>)
  800050e:	781b      	ldrb	r3, [r3, #0]
@@ -723,7 +721,6 @@ void updateLEDMatrix(int col){
  8000660:	080006b9 	.word	0x080006b9
  8000664:	080006c7 	.word	0x080006c7
 
-    // 3. Bật cột tương ứng
     switch(col){
     case 0: HAL_GPIO_WritePin(GPIOA, ENM0_Pin, GPIO_PIN_RESET); break;
  8000668:	2200      	movs	r2, #0
