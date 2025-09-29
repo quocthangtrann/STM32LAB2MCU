@@ -203,12 +203,12 @@ void updateLEDMatrix(int col){
 }
 
 
-//void shiftLeft(){
-//    for(int i = 0; i < MAX_LED_MATRIX - 1; i++){
-//        matrix_buffer[i] = matrix_buffer[i+1];
-//    }
-//    matrix_buffer[MAX_LED_MATRIX-1] = 0x00;
-//}
+void shiftLeft(){
+    for(int i = 0; i < MAX_LED_MATRIX - 1; i++){
+        matrix_buffer[i] = matrix_buffer[i+1];
+    }
+    matrix_buffer[MAX_LED_MATRIX-1] = 0x00;
+}
 
 /* USER CODE END 0 */
 
@@ -246,7 +246,7 @@ int main(void)
   setTimer1(25);   // 250ms
   setTimer2(100);
   setTimer3(2);
-  //setTimer4(20);
+  setTimer4(20);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -292,12 +292,12 @@ int main(void)
 	        index_led_matrix = (index_led_matrix + 1) % MAX_LED_MATRIX;
 	    }
 
-//	    // animation
-//	    if(timer4_flag == 1){
-//	        timer4_flag = 0;
-//	        setTimer4(200);
-//	        shiftLeft();
-//	    }
+	    // animation
+	    if(timer4_flag == 1){
+	        timer4_flag = 0;
+	        setTimer4(20);
+	        shiftLeft();
+	    }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
